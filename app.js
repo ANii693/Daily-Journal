@@ -18,6 +18,8 @@ const contactContent =
 
 const app = express();
 
+const PORT = process.env.PORT || 3000;
+
 app.set("view engine", "ejs");
 
 app.use(cookieParser());
@@ -65,7 +67,7 @@ connectDB()
     });
 
     if (!admin) {
-      const pass = process.env.pass
+      const pass = process.env.pass;
       const hashedPassword = await bcrypt.hash(pass, 10);
       await Admin.create({
         name: "admin",
@@ -101,7 +103,7 @@ connectDB()
       if (!isMatch)
         return res.render("login", { name, message: "Incorrect Password" });
 
-      const token = jwt.sign({ _id: admin._id },  process.env.secretkey);
+      const token = jwt.sign({ _id: admin._id }, process.env.secretkey);
 
       res.cookie("token", token, {
         httpOnly: true,
@@ -154,6 +156,6 @@ connectDB()
   })
   .catch((e) => console.log(e));
 
-app.listen(3000, function () {
-  console.log("Server started on port 3000");
+app.listen(PORT, function () {
+  console.log(`server is started on port ${PORT}`);
 });
