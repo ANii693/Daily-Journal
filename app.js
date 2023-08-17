@@ -54,8 +54,6 @@ connectDB()
 
     const Entry = mongoose.model("Entry", entrySchema);
 
-    const admin = await Admin.findOne({ name: "admin" });
-
     const data = await Entry.find();
 
     data.forEach((obj) => {
@@ -65,15 +63,6 @@ connectDB()
       };
       posts.push(post);
     });
-
-    if (!admin) {
-      const pass = process.env.pass;
-      const hashedPassword = await bcrypt.hash(pass, 10);
-      await Admin.create({
-        name: "admin",
-        password: hashedPassword,
-      });
-    }
 
     const isAuthenticated = async (req, res, next) => {
       const { token } = req.cookies;
@@ -88,7 +77,18 @@ connectDB()
       }
     };
 
-    app.get("/login", (req, res) => {
+    app.get("/login", async (req, res) => {
+      const admin = await Admin.findOne({ name: "admin" });
+
+      if (!admin) {
+        const pass = process.env.pass;
+        const hashedPassword = await bcrypt.hash(pass, 10);
+        await Admin.create({
+          name: "admin",
+          password: hashedPassword,
+        });
+      }
+
       res.render("login");
     });
 
